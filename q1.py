@@ -17,11 +17,16 @@ def get_table_information_from_database(database_filename):
         # Obtain result
         result = cursor.fetchall()
 
+
         table_names = []
 
         # for each row in the returned result dataset
         # add all rows to the table_names list excluding the rows that begin with "sqlite" (ie at row[0])
         # add code here:
+
+        for row in result:
+            if not "sqlite" in row[0]:
+                table_names.append(row[0])
 
         for table_name in table_names:
             stmt = "PRAGMA table_info('{}')".format(table_name)
@@ -35,8 +40,10 @@ def get_table_information_from_database(database_filename):
             # otherwise create a new key `table_name` in the dictionary with a new list consisting of
             # the element (ie a list with element column[1]).
             for column in columns:
-                # add code here:
-                pass
+                if table_name in metadata_dictionary:
+                    metadata_dictionary[table_name].append(column[1])
+                else:
+                    metadata_dictionary[table_name] = [column[1]]
 
     return metadata_dictionary
 
