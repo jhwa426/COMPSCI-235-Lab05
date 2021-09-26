@@ -11,16 +11,16 @@ def perform_query_for_whole_table(database_filename, table_name):
     with connection:
 
         # obtain a cursor from the connection
-        # cursor = ...
+        cursor = connection.cursor()
 
-        stmt = f"SELECT * FROM {table_name}"
+        stmt = f"SELECT * FROM {table_name}" ##Select all columns from table_name
 
         # execute the command on the cursor
-        # cursor.execute( ...
+        cursor.execute(stmt)
 
         # Obtain result
         # complete the code:
-        result = ()
+        result = cursor.fetchall()
 
     return result
 
