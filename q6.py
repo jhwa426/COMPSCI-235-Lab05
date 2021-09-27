@@ -3,25 +3,29 @@ import sqlite3
 
 def get_playlist(database_filename, which_playlist):
     # create sqlite connection here using the `database_filename` input
-    # connection = ...
+    connection = sqlite3.connect(database_filename)
 
     # obtain a cursor from the connection
-    # cursor = ...
+    cursor = connection.cursor()
 
     # this should be a sql that returns all PlaylistIds and Names,
     # from the playlists table if the Name is equal to `which_playlist`
     #
-    stmt = ""
+    stmt = "SELECT PlaylistId, Name FROM playlists WHERE Name='" + which_playlist + "'"
 
     # execute the command on the cursor
-    # cursor.execute( ...
+    cursor.execute(stmt)
 
     # Obtain result
-    result = ()
+    result = cursor.fetchall()
 
     # Using the result check that at least 1 result is returned
     # if not print an error and return an empty list.
     # add code here
+
+    if len(result) == 0:
+        print("ERROR: Could not find playlist '{}' in database!".format(which_playlist))
+        return []
 
     playlist_id = result[0][0]
     # print(playlist_id)
@@ -33,16 +37,21 @@ def get_playlist(database_filename, which_playlist):
     #       - especially which column that playlist_track should be joined on.
 
     # hint: the query should make use of the `playlist_id` parameter.
-    sql_stmt = ""
+    sql_stmt = "SELECT tracks.Name, album.Title, genre.Name, artist.Name, tracks.Composer FROM tracks \
+                INNER JOIN albums album ON tracks.AlbumId=album.AlbumId \
+                INNER JOIN genres genre ON tracks.GenreId=genre.GenreId \
+                INNER JOIN artists artist ON album.ArtistId=artist.ArtistId \
+                INNER JOIN playlist_track pt ON pt.PlaylistId = {} \
+                WHERE tracks.TrackId = pt.TrackId ".format(playlist_id)
 
     # execute the `sql_stmt` command on the cursor
-    # cursor.execute( ...
+    cursor.execute(sql_stmt)
 
     # Obtain result
-    result = ()
+    result = cursor.fetchall()
 
     # Then close connection
-    # connection. ...
+    connection.close()
 
     return result
 
