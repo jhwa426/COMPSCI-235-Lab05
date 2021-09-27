@@ -4,8 +4,47 @@ import sqlite3
 
 
 def get_table_information_from_database(database_filename):
-    # Bring in code from question 1
+    # create sqlite connection here using the `database_filename` input
+    connection = sqlite3.connect(database_filename)
+
     metadata_dictionary = {}
+
+    with connection:
+        # obtain a cursor from the connection
+        cursor = connection.cursor()
+        # execute the command on the cursor
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        # Obtain result
+        result = cursor.fetchall()
+
+
+        table_names = []
+
+        # for each row in the returned result dataset
+        # add all rows to the table_names list excluding the rows that begin with "sqlite" (ie at row[0])
+        # add code here:
+
+        for row in result:
+            if not "sqlite" in row[0]:
+                table_names.append(row[0])
+
+        for table_name in table_names:
+            stmt = "PRAGMA table_info('{}')".format(table_name)
+            cursor.execute(stmt)
+
+            columns = cursor.fetchall()
+
+            # for each row in the returned columns
+            # populate the dictionary such that:
+            # If the `table_name` is already in the dictionary, append to the existing list
+            # otherwise create a new key `table_name` in the dictionary with a new list consisting of
+            # the element (ie a list with element column[1]).
+            for column in columns:
+                if table_name in metadata_dictionary:
+                    metadata_dictionary[table_name].append(column[1])
+                else:
+                    metadata_dictionary[table_name] = [column[1]]
+
     return metadata_dictionary
 
 
@@ -18,27 +57,27 @@ def get_best_of_albums(database_filename, column_name_for_ordering):
         return []
 
     # create new sqlite connection here using the `database_filename` input
-    # connection = ...
+    connection = sqlite3.connect(database_filename)
 
     result = []
 
     # with the context of `connection`
-    #with connection:
+    with connection:
 
         # obtain a cursor from the connection
-        # cursor = ...
+        cursor = connection.cursor()
 
         # this should be a sql command  that returns all columns
         # from albums where the title contains "Greatest Hits" OR "Best Of"
         # the returned query data should be sorted according to the input `column_name_for_ordering`.
             # hint you can choose to use .format() on the string query to insert `column_name_for_ordering`.
 
-        #stmt = ...
+        stmt = "SELECT * FROM albums WHERE Title LIKE '%Greatest Hits%' OR Title Like '%Best Of%' ORDER BY {}".format(column_name_for_ordering)
 
         # execute the command on the cursor
-        # cursor.execute( ...
+        cursor.execute(stmt)
 
-        # result = cursor.fetchall()
+        result = cursor.fetchall()
 
     return result
 
