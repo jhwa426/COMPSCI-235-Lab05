@@ -4,34 +4,36 @@ import sqlite3
 
 
 def get_all_artists_with_at_least_n_albums(database_filename, n):
-
     # create sqlite connection here using the `database_filename` input
-    # connection = ...
+    connection = sqlite3.connect(database_filename)
 
     # obtain a cursor from the connection
-    # cursor = ...
+    cursor = connection.cursor()
 
     # this should be a sql that returns all artist ids, artist names, and the Number of albums
     # The returned tuples should only include artists with greater than or equal to `n` parameter
     # album count.
     # The returned dataset should be ordered by the number of albums descending, and if the number is the same, then
     # by the artists name ascending.
-    #
+
     # The returned dataset should not have multiple tuples for the same artist
     # - the count of albums should be together in 1 tuple representing the artist.
     # - Hint: use `GROUP BY`
-    #
+
     # Hint: use an inner join to match artists to albums to get all necessary return types
-    stmt = ""
+    stmt = "SELECT AR.ArtistId AS 'Artist ID', AR.name AS 'Artist name', count(AL.AlbumId) AS 'Number of albums'\
+            FROM albums AL JOIN artists AR ON AL.ArtistId = AR.ArtistId\
+            GROUP BY AR.name\
+            HAVING count(AL.AlbumId) >= " + str(n) + "\
+            ORDER BY count(AL.AlbumId) DESC, AR.name ASC"
 
     # execute the command on the cursor
-    # cursor.execute( ...
+    cursor.execute(stmt)
 
     # Obtain result
-    result = ()
-
+    result = cursor.fetchall()
     # Then close connection
-    # code here
+    connection.close()
 
     return result
 
